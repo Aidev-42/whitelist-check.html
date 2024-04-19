@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Whitelist Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black; /* Black background */
+            color: white; /* White text */
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            max-inline-size: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #222; /* Dark background */
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #fff;
+        }
+        input[type="text"] {
+            inline-size: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-block-end: 20px;
+        }
+        button {
+            inline-size: 100%;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #resultMessage {
+            font-weight: bold;
+            margin-block-start: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <img src="https://i.imgur.com/6aEc1CB.gif" alt="Logo GIF" style="display: block; margin: 0 auto; inline-size: 200px;">
+        <h1>Check if a Wallet Address is Whitelisted</h1>
+        <input type="text" id="addressInput" placeholder="Enter wallet address">
+        <button onclick="checkWhitelist()">Check</button>
+        <p id="resultMessage"></p>
+    </div>
+
+    <script>
+        async function checkWhitelist() {
+            const addressInput = document.getElementById('addressInput').value.trim();
+
+            // Check if address input is empty
+            if (addressInput === '') {
+                const resultMessage = document.getElementById('resultMessage');
+                resultMessage.textContent = 'Please enter an address.';
+                resultMessage.style.color = 'orange'; // Orange text for warning message
+                return; // Exit function if address is empty
+            }
+
+            let isWhitelisted = false;
+
+            // Fetch the CSV file from the provided URL
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/Aidev-42/snapshot/main/whitelist_addresses.csv');
+                const csvData = await response.text();
+
+                // Parse CSV data into array of addresses
+                const whitelist = csvData.split('\n').map(row => row.split(',')[0].trim());
+
+                // Check if the entered address is in the whitelist
+                if (whitelist.includes(addressInput)) {
+                    isWhitelisted = true;
+                }
+
+                // Display result
+                const resultMessage = document.getElementById('resultMessage');
+                if (isWhitelisted) {
+                    resultMessage.textContent = 'The address is whitelisted!';
+                    resultMessage.style.color = 'lime'; // Green text if whitelisted
+                } else {
+                    resultMessage.textContent = 'The address is not whitelisted.';
+                    resultMessage.style.color = 'red'; // Red text if not whitelisted
+                }
+            } catch (error) {
+                console.error('Error fetching CSV:', error);
+                const resultMessage = document.getElementById('resultMessage');
+                resultMessage.textContent = 'Error fetching whitelist data.';
+                resultMessage.style.color = 'orange'; // Orange text in case of error
+            }
+        }
+    </script>
+</body>
+</html>
